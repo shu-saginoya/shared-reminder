@@ -1,10 +1,75 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
-import HelloWorld from "@/components/HelloWorld.vue";
+/* import HelloWorld from "@/components/HelloWorld.vue"; */
+import { inject, ref, reactive } from "vue";
+
+const axios: any = inject("axios");
+
+interface Task {
+  id: string;
+  name: string;
+  note?: string;
+  isCompleted: boolean;
+  /*   registrationDate: string;
+  updateDate: string; */
+  picOut: boolean;
+}
+const newTask = reactive<Task>({
+  id: "",
+  name: "",
+  note: "",
+  isCompleted: false,
+  /*   registrationDate: '',
+  updateDate: '', */
+  picOut: false,
+});
+const addTask = (): void => {
+  /*   newTask.registrationDate = new Date();
+  newTask.updateDate = new Date(); */
+  axios
+    .post(
+      "https://firestore.googleapis.com/v1/projects/shared-reminder/databases/(default)/documents/task",
+      {
+        fields: {
+          task: {
+            objectValue: newTask,
+          },
+        },
+      }
+    )
+    .then((response: { data: any }) => {
+      console.log(response);
+    })
+    .catch((error: { data: any }) => {
+      console.log(error);
+    });
+  newTask.name = "";
+  newTask.note = "";
+};
 </script>
 
 <template>
   <header>
+    <h1>Shared Reminder</h1>
+  </header>
+  <main>
+    <div>
+      <label>
+        タスク
+        <input type="text" v-model="newTask.name" />
+      </label>
+    </div>
+    <div>
+      <label>
+        備考
+        <textarea v-model="newTask.note"></textarea>
+      </label>
+    </div>
+    <div>
+      <button @click="addTask()">追加</button>
+    </div>
+  </main>
+  <!--   <header>
     <img
       alt="Vue logo"
       class="logo"
@@ -23,13 +88,13 @@ import HelloWorld from "@/components/HelloWorld.vue";
     </div>
   </header>
 
-  <RouterView />
+  <RouterView /> -->
 </template>
 
 <style>
 @import "@/assets/base.css";
 
-#app {
+/* #app {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
@@ -121,5 +186,5 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
-}
+} */
 </style>
