@@ -1,38 +1,52 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-/* import HelloWorld from "@/components/HelloWorld.vue"; */
-import { inject, ref, reactive } from "vue";
+/* import { RouterLink, RouterView } from "vue-router";*/
+/* import HelloWorld from "@/components/HelloWorld.vue";*/
+import { inject, reactive, computed } from "vue";
 
 const axios: any = inject("axios");
 
 interface Task {
-  id: string;
+  /* id: string; */
   name: string;
   note?: string;
-  isCompleted: boolean;
-  /*   registrationDate: string;
-  updateDate: string; */
-  picOut: boolean;
+  /*   isCompleted: boolean;
+  registrationDate: string;
+  updateDate: string;
+  picOut: boolean; */
 }
 const newTask = reactive<Task>({
-  id: "",
+  /* id: "", */
   name: "",
   note: "",
-  isCompleted: false,
-  /*   registrationDate: '',
-  updateDate: '', */
-  picOut: false,
+  /*   isCompleted: false,
+  registrationDate: '',
+  updateDate: '', 
+  picOut: false,*/
 });
+
+const tasks: any = computed(() => {
+  axios
+    .get(
+      "https://firestore.googleapis.com/v1/projects/shared-reminder/databases/(default)/documents/tasks"
+    )
+    .then((response: { data: any }) => {
+      return response.data.tasks;
+    });
+});
+
 const addTask = (): void => {
   /*   newTask.registrationDate = new Date();
   newTask.updateDate = new Date(); */
   axios
     .post(
-      "https://firestore.googleapis.com/v1/projects/shared-reminder/databases/(default)/documents/task",
+      "https://firestore.googleapis.com/v1/projects/shared-reminder/databases/(default)/documents/tasks",
       {
         fields: {
-          task: {
-            objectValue: newTask,
+          name: {
+            stringValue: newTask.name,
+          },
+          note: {
+            stringValue: newTask.note,
           },
         },
       }
@@ -67,6 +81,13 @@ const addTask = (): void => {
     </div>
     <div>
       <button @click="addTask()">追加</button>
+    </div>
+    <div>
+      <ul>
+        <li v-for="(task, index) in tasks" :key="index">
+          {{ tasks.name }}
+        </li>
+      </ul>
     </div>
   </main>
   <!--   <header>
